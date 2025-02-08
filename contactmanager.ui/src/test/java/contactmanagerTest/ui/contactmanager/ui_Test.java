@@ -20,18 +20,18 @@ public class ui_Test {
         @Test
         void testAddingNewContact() {
             // Create a new contact
-            Contact contact = new Contact("John Doe", "1234567890", "johndoe@example.com");
+            Contact contact = new Contact("Samson Neyo", "734567890", "samson@example.com");
 
             // Verify that the contact details are correctly set
-            assertEquals("John Doe", contact.getName());
-            assertEquals("1234567890", contact.getPhone());
-            assertEquals("johndoe@example.com", contact.getEmail());
+            assertEquals("Samson Neyo", contact.getName());
+            assertEquals("734567890", contact.getPhone());
+            assertEquals("samson@example.com", contact.getEmail());
 
 
 
         }
 
-        
+
 
 
     }
