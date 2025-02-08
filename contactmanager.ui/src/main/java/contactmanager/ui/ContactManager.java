@@ -18,7 +18,7 @@ public class ContactManager extends JFrame {
     private JPanel contactDetailPanel;
     private JPanel contactFormPanel;
 
-    private ArrayList<Contact> contacts;
+    public ArrayList<Contact> contacts;
 
     private int selectedContactIndex = -1;
 

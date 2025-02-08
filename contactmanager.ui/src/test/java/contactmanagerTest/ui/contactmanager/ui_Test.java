@@ -5,6 +5,8 @@ import contactmanager.ui.ContactManager;
 import org.junit.jupiter.api.Test;
 
 
+import javax.swing.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -30,7 +32,16 @@ public class ui_Test {
 
 
         }
-
+    @Test
+    void testDeleteContact() {
+        SwingUtilities.invokeLater(() -> {
+            Contact contact = new Contact("Samson Neyo", "734567890", "samson@example.com");
+            contactManager.contacts.add(contact);
+            assertEquals(1, contactManager.contacts.size());
+            contactManager.contacts.remove(0);
+            assertEquals(0, contactManager.contacts.size());
+        });
+    }
 
 
 
