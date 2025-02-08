@@ -20,13 +20,13 @@ public class ContactManager extends JFrame {
 
     public ArrayList<Contact> contacts;
 
-    private int selectedContactIndex = -1;
+    public int selectedContactIndex = -1;
 
-    private JTextField formNameField;
-    private JTextField formPhoneField;
-    private JTextField formEmailField;
+    public JTextField formNameField;
+    public JTextField formPhoneField;
+    public JTextField formEmailField;
 
-    private JLabel detailNameLabel;
+    public JLabel detailNameLabel;
     private JLabel detailPhoneLabel;
     private JLabel detailEmailLabel;
 
@@ -281,7 +281,7 @@ public class ContactManager extends JFrame {
 
 
 //Method to show Contact Details
-    private void showContactDetails(int index) {
+public void showContactDetails(int index) {
         if (index < 0 || index >= contacts.size())
             return;
         Contact c = contacts.get(index);

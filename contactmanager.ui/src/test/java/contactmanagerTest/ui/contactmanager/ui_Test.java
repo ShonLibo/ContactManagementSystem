@@ -29,9 +29,34 @@ public class ui_Test {
             assertEquals("734567890", contact.getPhone());
             assertEquals("samson@example.com", contact.getEmail());
 
-
-
         }
+
+    @Test
+    void testEditContact() {
+        SwingUtilities.invokeLater(() -> {
+            Contact contact = new Contact("Samson Neyo", "734567890", "samson@example.com");
+            contactManager.contacts.add(contact);
+            contactManager.selectedContactIndex = 0;
+            contactManager.formNameField.setText("Adil Jacob");
+            contactManager.formPhoneField.setText("078484844");
+            contactManager.formEmailField.setText("adiljacob@gmail.com");
+            contact.setName("Adil Jacob");
+            contact.setPhone("078484844");
+            contact.setEmail("adiljacob@gmail.com");
+            assertEquals("Adil Jacob", contactManager.contacts.get(0).getName());
+        });
+    }
+
+    @Test
+    void testShowContactDetails() {
+        SwingUtilities.invokeLater(() -> {
+            Contact contact = new Contact("Adil Jacob", "078484844", "adiljacob@gmail.com");
+            contactManager.contacts.add(contact);
+            contactManager.showContactDetails(0);
+            assertEquals("Name: Adil Jacob", contactManager.detailNameLabel.getText());
+        });
+    }
+
     @Test
     void testDeleteContact() {
         SwingUtilities.invokeLater(() -> {
