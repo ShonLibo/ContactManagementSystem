@@ -120,7 +120,7 @@ public class ContactManager extends JFrame {
         for (int i = 0; i < contacts.size(); i++) {
             Contact contact = contacts.get(i);
 
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
             rowPanel.setBackground(new Color(230, 230, 230));
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             // Store the row's index for later reference.
