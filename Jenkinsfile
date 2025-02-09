@@ -31,7 +31,7 @@
 
         stage('Integration Tests') { // runs integration test
                     steps {
-                        sh 'mvn verify -D skipUnitTests'
+                        sh 'mvn verify'
                     }
 
 
