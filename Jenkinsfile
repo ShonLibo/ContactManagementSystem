@@ -16,7 +16,7 @@
 
             steps{
                withSonarQubeEnv( installationName:'sonarQ'){
-                    sh 'mvn sonar:sonar'
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                }
             }
 
