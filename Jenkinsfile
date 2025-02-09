@@ -15,8 +15,12 @@
          stage(sonarQube inspection){
 
             steps{
-               withSonarQubeEnv( installationName:'sonarQ'){
-                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+               withSonarQubeEnv('sonarQ'){
+                    //sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+
+                    sh 'sonar-scanner -D sonar.projectKey=sonarQ'
+
+
                }
             }
 
