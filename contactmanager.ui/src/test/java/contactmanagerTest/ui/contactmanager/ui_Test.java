@@ -67,6 +67,6 @@ public class ui_Test {
             assertEquals(0, contactManager.contacts.size());
         });
     }
-    
+
     }
 

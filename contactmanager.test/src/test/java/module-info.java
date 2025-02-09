@@ -3,5 +3,6 @@ module contactmanager.test {
     requires contactmanager.model;
     requires org.junit.jupiter.api;
     requires java.desktop;
+    exports integrationTest;
 
 }

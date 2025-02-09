@@ -27,8 +27,8 @@ public class ContactManager extends JFrame {
     public JTextField formEmailField;
 
     public JLabel detailNameLabel;
-    private JLabel detailPhoneLabel;
-    private JLabel detailEmailLabel;
+    public JLabel detailPhoneLabel;
+    public JLabel detailEmailLabel;
 
     public ContactManager() {
         setTitle("Contact Management System");
