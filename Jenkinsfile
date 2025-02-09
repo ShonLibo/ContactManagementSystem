@@ -16,7 +16,7 @@
 
             steps{
                withSonarQubeEnv( installationName:'sonarQ'){
-                    sh 'mvn sonar;sonar'
+                    sh 'mvn sonar:sonar'
                }
             }
 
