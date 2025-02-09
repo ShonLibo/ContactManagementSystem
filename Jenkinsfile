@@ -12,6 +12,17 @@
              }
          }
 
+         stage(sonarQube inspection){
+
+            steps{
+               withSonarQubeEnv( installationName:'sonarQ'){
+                    sh 'mvn sonar;sonar'
+               }
+            }
+
+         }
+
+
        stage('Build') {         // compiles the source code
              steps {
                  sh 'mvn clean compile'
