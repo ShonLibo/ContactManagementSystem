@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IntegrationTest {
+public class IT {
 
     private ContactManager contactManager;
 
