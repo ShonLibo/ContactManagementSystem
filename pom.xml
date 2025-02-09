@@ -47,7 +47,10 @@
 
 
     <build>
+        <testSourceDirectory>src/test/java/integrationTest</testSourceDirectory>
+
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
