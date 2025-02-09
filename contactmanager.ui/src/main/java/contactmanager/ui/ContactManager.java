@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class ContactManager extends JFrame {
 
+    //instance variable refactored out
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
@@ -17,30 +18,26 @@ public class ContactManager extends JFrame {
     private JPanel contactDetailPanel;
     private JPanel contactFormPanel;
 
-    public ArrayList<Contact> contacts;
-    private ContactService contactService;
+    private ArrayList<Contact> contacts;
 
-    public int selectedContactIndex = -1;
+    private int selectedContactIndex = -1;
 
-    public JTextField formNameField;
-    public JTextField formPhoneField;
-    public JTextField formEmailField;
+    private JTextField formNameField;
+    private JTextField formPhoneField;
+    private JTextField formEmailField;
 
-    public JLabel detailNameLabel;
-    public JLabel detailPhoneLabel;
-    public JLabel detailEmailLabel;
+    private JLabel detailNameLabel;
+    private JLabel detailPhoneLabel;
+    private JLabel detailEmailLabel;
+
 
     public ContactManager() {
+
         setTitle("Contact Management System");
 
         contacts = new ArrayList<>();
-        contactService = new ContactService(contacts);
 
-        // Initialize UI components
-        ContactManager();
-    }
-
-    private void ContactManager() {
+        /*preparing Card layout and main panel*/
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         mainPanel.setBackground(new Color(240, 240, 240));
@@ -56,18 +53,20 @@ public class ContactManager extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainPanel, BorderLayout.CENTER);
 
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(550, 450);
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    private void createContactListPanel() {
+    //Here were are creating contact list panel
+    public void createContactListPanel() {
         contactListPanel = new JPanel(new BorderLayout());
-        ContactUIHelper.styleCardPanel(contactListPanel);
+        styleCardPanel(contactListPanel);
 
         JLabel header = new JLabel("CONTACT LIST VIEW", JLabel.CENTER);
-        ContactUIHelper.styleHeaderLabel(header);
+        styleHeaderLabel(header);
         contactListPanel.add(header, BorderLayout.NORTH);
 
         JPanel listContainer = new JPanel();
@@ -84,7 +83,7 @@ public class ContactManager extends JFrame {
         bottomPanel.setBackground(new Color(240, 240, 240));
 
         JButton addNewContactBtn = new JButton("Add New Contact");
-        ContactUIHelper.styleButton(addNewContactBtn);
+        styleButton(addNewContactBtn);
         addNewContactBtn.addActionListener(e -> {
             clearFormFields();
             selectedContactIndex = -1; // Indicate new contact
@@ -92,7 +91,7 @@ public class ContactManager extends JFrame {
         });
 
         JButton viewDetailBtn = new JButton("View Detail");
-        ContactUIHelper.styleButton(viewDetailBtn);
+        styleButton(viewDetailBtn);
         viewDetailBtn.addActionListener(e -> {
             if (selectedContactIndex >= 0 && selectedContactIndex < contacts.size()) {
                 showContactDetails(selectedContactIndex);
@@ -110,44 +109,71 @@ public class ContactManager extends JFrame {
         bottomPanel.add(addNewContactBtn);
         bottomPanel.add(viewDetailBtn);
         contactListPanel.add(bottomPanel, BorderLayout.SOUTH);
+
     }
 
+
+//Here is Refreshing contact list panel
     private void refreshContactListPanel(JPanel listContainer) {
         listContainer.removeAll();
 
         for (int i = 0; i < contacts.size(); i++) {
             Contact contact = contacts.get(i);
 
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             rowPanel.setBackground(new Color(230, 230, 230));
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            // Store the row's index for later reference.
             rowPanel.putClientProperty("index", i);
 
+            // Create a unified mouse adapter for hover and click.
+            MouseAdapter adapter = new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    // Get the index of the clicked row (stored as a client property)
+                    Integer rowIndex = (Integer) rowPanel.getClientProperty("index");
+
+                    // Set the selected contact index to the row's index, or -1 if no index found
+                    selectedContactIndex = (rowIndex != null) ? rowIndex : -1;
+
+                    // Update the colors of all rows to reflect the selection
+                    updateRowPanelColors(listContainer);
+                }
+
+            };
+
+            // Contact name label
             JLabel nameLabel = new JLabel(contact.getName());
             nameLabel.setPreferredSize(new Dimension(250, 20));
             nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            nameLabel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
             nameLabel.setForeground(Color.BLACK);
             nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            // Clicking the label also selects the row.
             nameLabel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     selectedContactIndex = contacts.indexOf(contact);
-                    ContactUIHelper.updateRowPanelColors(listContainer, selectedContactIndex);
+                    updateRowPanelColors(listContainer);
                 }
             });
 
+
+            // Edit button
             JButton editButton = new JButton("Edit");
-            ContactUIHelper.styleButton(editButton);
-            int finalI = i;
+            styleButton(editButton);
+            int finalI1 = i;
             editButton.addActionListener(e -> {
-                selectedContactIndex = finalI;
+                selectedContactIndex = finalI1;
                 formNameField.setText(contact.getName());
                 formPhoneField.setText(contact.getPhone());
                 formEmailField.setText(contact.getEmail());
                 cardLayout.show(mainPanel, "CONTACT_FORM");
-                ContactUIHelper.updateRowPanelColors(listContainer, selectedContactIndex);
+                updateRowPanelColors(listContainer);
             });
+
+            // Delete button  with confirmation dialog
 
             JButton deleteButton = new JButton("Delete");
             deleteButton.setBackground(Color.RED);
@@ -155,17 +181,18 @@ public class ContactManager extends JFrame {
             deleteButton.setFocusPainted(false);
             deleteButton.setFont(new Font("Arial", Font.BOLD, 13));
             deleteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            int finalI1 = i;
+            int finalI = i;
             deleteButton.addActionListener(e -> {
                 int result = JOptionPane.showConfirmDialog(
-                        this,
+                        ContactManager.this,
                         "Are you sure you want to delete this record?",
                         "Confirm Delete",
                         JOptionPane.YES_NO_OPTION
                 );
                 if (result == JOptionPane.YES_OPTION) {
-                    contactService.deleteContact(finalI1);
-                    if (finalI1 == selectedContactIndex) {
+                    contacts.remove(finalI);
+                    // If the deleted row was selected, reset selection.
+                    if(finalI == selectedContactIndex) {
                         selectedContactIndex = -1;
                     }
                     refreshContactListPanel(listContainer);
@@ -177,17 +204,42 @@ public class ContactManager extends JFrame {
             rowPanel.add(deleteButton);
             rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, rowPanel.getPreferredSize().height));
             listContainer.add(rowPanel);
+            // Add a 10px vertical gap after each row.
+            listContainer.add(Box.createVerticalStrut(10));
+
         }
         listContainer.revalidate();
         listContainer.repaint();
+
     }
 
-    private void createContactDetailPanel() {
+
+    //method for updating row panel
+    private void updateRowPanelColors(JPanel listContainer) {
+        Component[] comps = listContainer.getComponents();
+        for (Component comp : comps) {
+            if (comp instanceof JPanel) {
+                JPanel row = (JPanel) comp;
+                Integer idx = (Integer) row.getClientProperty("index");
+                if (idx != null && idx == selectedContactIndex) {
+                    row.setBackground(new Color(180, 180, 180));
+                } else {
+                    row.setBackground(new Color(230, 230, 230));
+                }
+            }
+        }
+        listContainer.repaint();
+    }
+
+
+//Here we're creating Contact Detail panel
+
+    private void createContactDetailPanel(){
         contactDetailPanel = new JPanel(new BorderLayout());
-        ContactUIHelper.styleCardPanel(contactDetailPanel);
+        styleCardPanel(contactDetailPanel);
 
         JLabel header = new JLabel("CONTACT DETAILS VIEW", SwingConstants.CENTER);
-        ContactUIHelper.styleHeaderLabel(header);
+        styleHeaderLabel(header);
         contactDetailPanel.add(header, BorderLayout.NORTH);
 
         JPanel detailContainer = new JPanel();
@@ -195,12 +247,12 @@ public class ContactManager extends JFrame {
         detailContainer.setBackground(new Color(230, 230, 230));
         detailContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        detailNameLabel = new JLabel("Name: ");
+        detailNameLabel  = new JLabel("Name: ");
         detailPhoneLabel = new JLabel("Telephone Number: ");
         detailEmailLabel = new JLabel("Email Address: ");
-        ContactUIHelper.styleDetailLabel(detailNameLabel);
-        ContactUIHelper.styleDetailLabel(detailPhoneLabel);
-        ContactUIHelper.styleDetailLabel(detailEmailLabel);
+        styleDetailLabel(detailNameLabel);
+        styleDetailLabel(detailPhoneLabel);
+        styleDetailLabel(detailEmailLabel);
 
         detailContainer.add(detailNameLabel);
         detailContainer.add(Box.createVerticalStrut(10));
@@ -214,11 +266,11 @@ public class ContactManager extends JFrame {
         bottomPanel.setBackground(new Color(240, 240, 240));
 
         JButton backBtn = new JButton("Back To List");
-        ContactUIHelper.styleButton(backBtn);
+        styleButton(backBtn);
         backBtn.addActionListener(e -> cardLayout.show(mainPanel, "CONTACT_LIST"));
 
         JButton listViewBtn = new JButton("Contact List View");
-        ContactUIHelper.styleButton(listViewBtn);
+        styleButton(listViewBtn);
         listViewBtn.addActionListener(e -> cardLayout.show(mainPanel, "CONTACT_LIST"));
 
         bottomPanel.add(backBtn);
@@ -227,20 +279,24 @@ public class ContactManager extends JFrame {
         contactDetailPanel.add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    public void showContactDetails(int index) {
-        if (index < 0 || index >= contacts.size()) return;
+
+//Method to show Contact Details
+    private void showContactDetails(int index) {
+        if (index < 0 || index >= contacts.size())
+            return;
         Contact c = contacts.get(index);
         detailNameLabel.setText("Name: " + c.getName());
         detailPhoneLabel.setText("Telephone Number: " + c.getPhone());
         detailEmailLabel.setText("Email Address: " + c.getEmail());
     }
 
-    private void createContactFormPanel() {
+  //Here we create contact form panel
+    private void createContactFormPanel(){
         contactFormPanel = new JPanel(new BorderLayout());
-        ContactUIHelper.styleCardPanel(contactFormPanel);
+        styleCardPanel(contactFormPanel);
 
         JLabel header = new JLabel("CONTACT CREATION FORM", JLabel.CENTER);
-        ContactUIHelper.styleHeaderLabel(header);
+        styleHeaderLabel(header);
         contactFormPanel.add(header, BorderLayout.NORTH);
 
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -248,19 +304,19 @@ public class ContactManager extends JFrame {
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 20));
 
         JLabel nameLabel = new JLabel("Name:");
-        ContactUIHelper.styleDetailLabel(nameLabel);
+        styleDetailLabel(nameLabel);
         formNameField = new JTextField();
         formPanel.add(nameLabel);
         formPanel.add(formNameField);
 
         JLabel phoneLabel = new JLabel("Tel No:");
-        ContactUIHelper.styleDetailLabel(phoneLabel);
+        styleDetailLabel(phoneLabel);
         formPhoneField = new JTextField();
         formPanel.add(phoneLabel);
         formPanel.add(formPhoneField);
 
         JLabel emailLabel = new JLabel("Email:");
-        ContactUIHelper.styleDetailLabel(emailLabel);
+        styleDetailLabel(emailLabel);
         formEmailField = new JTextField();
         formPanel.add(emailLabel);
         formPanel.add(formEmailField);
@@ -271,11 +327,38 @@ public class ContactManager extends JFrame {
         bottomPanel.setBackground(new Color(240, 240, 240));
 
         JButton saveBtn = new JButton("Save Contact");
-        ContactUIHelper.styleButton(saveBtn);
-        saveBtn.addActionListener(e -> saveContact());
+        styleButton(saveBtn);
+        saveBtn.addActionListener(e -> {
+            String name  = formNameField.getText().trim();
+            String phone = formPhoneField.getText().trim();
+            String email = formEmailField.getText().trim();
+
+            //function to check all the fills whether are empty
+            if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "All fields must be filled out before saving.",
+                        "Validation Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            if (selectedContactIndex == -1) {
+                contacts.add(new Contact(name, phone, email));
+            } else {
+                Contact c = contacts.get(selectedContactIndex);
+                c.setName(name);
+                c.setPhone(phone);
+                c.setEmail(email);
+            }
+
+            cardLayout.show(mainPanel, "CONTACT_LIST");
+            refreshContactListPanel((JPanel)((JScrollPane)contactListPanel.getComponent(1)).getViewport().getView());
+        });
 
         JButton cancelBtn = new JButton("Cancel");
-        ContactUIHelper.styleButton(cancelBtn);
+        styleButton(cancelBtn);
         cancelBtn.addActionListener(e -> cardLayout.show(mainPanel, "CONTACT_LIST"));
 
         bottomPanel.add(saveBtn);
@@ -283,34 +366,41 @@ public class ContactManager extends JFrame {
         contactFormPanel.add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    private void saveContact() {
-        String name = formNameField.getText().trim();
-        String phone = formPhoneField.getText().trim();
-        String email = formEmailField.getText().trim();
-
-        if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "All fields must be filled out before saving.",
-                    "Validation Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-
-        if (selectedContactIndex == -1) {
-            contactService.addContact(name, phone, email);
-        } else {
-            contactService.editContact(selectedContactIndex, name, phone, email);
-        }
-
-        cardLayout.show(mainPanel, "CONTACT_LIST");
-        refreshContactListPanel((JPanel) ((JScrollPane) contactListPanel.getComponent(1)).getViewport().getView());
-    }
-
     private void clearFormFields() {
         formNameField.setText("");
         formPhoneField.setText("");
         formEmailField.setText("");
     }
+
+    private void styleCardPanel(JPanel panel) {
+        panel.setBackground(new Color(240, 240, 240));
+        panel.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(180, 180, 180), 10),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                )
+        );
+    }
+
+    private void styleHeaderLabel(JLabel label) {
+        label.setOpaque(true);
+        label.setBackground(new Color(70, 130, 180)); // SteelBlue
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        label.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+    }
+
+    private void styleDetailLabel(JLabel label) {
+        label.setFont(new Font("Arial", Font.PLAIN, 16));
+        label.setForeground(Color.BLACK);
+    }
+
+    private void styleButton(JButton button) {
+        button.setBackground(new Color(70, 130, 180)); // SteelBlue
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 13));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
 }

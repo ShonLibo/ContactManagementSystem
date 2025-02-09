@@ -36,4 +36,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-contactmanager.test/src/test/java/integrationTest/ContactManagerIntegrationTest.java
